@@ -25,9 +25,9 @@ ids = [calculate_seat_id(seat) for seat in seats]
 
 
 def find_seat(seat_ids):
-    for i in range(len(seat_ids) - 1):
-        if seat_ids[i + 1] == seat_ids[i] + 2:
-            return seat_ids[i] + 1
+    for i in range(min(seat_ids), max(seat_ids)):
+        if i not in seat_ids:
+            return i
 
 
-print(find_seat(sorted(ids)))
+print(find_seat(ids))
