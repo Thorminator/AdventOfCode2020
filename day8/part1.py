@@ -12,11 +12,11 @@ def perform_instruction(instruction, index, memory, seen_indices):
     if index in seen_indices:
         return -1
     seen_indices.add(index)
-    name = instruction[0]
-    if name == "acc":
-        memory["acc"] = memory["acc"] + instruction[1]
-    elif name == "jmp":
-        return index + instruction[1]
+    opcode, arg = instruction
+    if opcode == "acc":
+        memory["acc"] = memory["acc"] + arg
+    elif opcode == "jmp":
+        return index + arg
     return index + 1
 
 
