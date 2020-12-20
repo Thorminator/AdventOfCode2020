@@ -1,13 +1,31 @@
+import re
+
+number_re = re.compile(r"^\d+$")
+operators = {"+", "*"}
+
+
 def parse_input(file_name):
     with open(file_name) as f:
         return f.read().splitlines()
 
 
-expressions = parse_input("example1.txt")
+expressions = parse_input("example2.txt")
 
 
-def consume_expression(expression):
-    pass
+def consume_expression(txt):
+    if is_number(txt):
+        return txt, ""
+
+    pars = 0
+    for i, char in enumerate(txt):
+        if char == "(":
+            pars += 1
+        elif char == ")":
+            pars -= 1
+            if pars == 0:
+                return txt[:i+1], txt[i+1:]
+        elif char in operators and pars == 0:
+            return txt[:i], txt[i:]
 
 
 def transform_operator(operator):
@@ -19,21 +37,28 @@ def transform_operator(operator):
 
 
 def consume_operator(txt):
-    stripped = txt.strip()
-    operator, rest = stripped[0], stripped[1:].strip()
+    operator, rest = txt[0], txt[1:]
     return transform_operator(operator), rest
+
+
+def is_number(txt):
+    return number_re.match(txt) is not None
 
 
 def split_expression(expression):
     left, rest = consume_expression(expression)
     operator, rest = consume_operator(rest)
-    right, _ = consume_expression(rest)
+    right, rest = consume_expression(rest)
+    return left, right, operator, rest
 
 
 def evaluate_expression(expression):
-    #TODO: Check if expression does not need to be split and just 'evaluate'
-    left, operator, right = split_expression(expression)
-    return operator(evaluate_expression(left), evaluate_expression(right))
+    expression = re.sub("\s", "", expression)
+    if is_number(expression):
+        return int(expression)
+
+    left, right, operator, rest = split_expression(expression)
+    return evaluate_expression(str(operator(evaluate_expression(left), evaluate_expression(right))) + rest)
 
 
-result = sum(evaluate_expression(expression) for expression in expressions)
+print(sum(evaluate_expression(expression) for expression in expressions))
